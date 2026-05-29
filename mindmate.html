@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindMate – Smart Safety for Alzheimer's Patients</title>
+<meta name="description" content="MindMate is a SIM-based smart badge device providing real-time GPS tracking, health monitoring, and emergency alerts for Alzheimer's patients.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B2545;
+    --blue: #1565C0;
+    --sky: #2196F3;
+    --teal: #00897B;
+    --mint: #E8F5E9;
+    --light-blue: #E3F2FD;
+    --white: #FFFFFF;
+    --off-white: #F7FAFC;
+    --gray: #546E7A;
+    --light-gray: #ECEFF1;
+    --red-alert: #E53935;
+    --gold: #F9A825;
+    --radius: 16px;
+    --shadow: 0 4px 32px rgba(11,37,69,0.10);
+    --shadow-lg: 0 8px 48px rgba(11,37,69,0.16);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--navy);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  h1,h2,h3,h4 { font-family: 'Sora', sans-serif; }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(21,101,192,0.10);
+    padding: 0 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+    transition: box-shadow .3s;
+  }
+  nav.scrolled { box-shadow: var(--shadow); }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Sora', sans-serif;
+    font-weight: 800; font-size: 1.4rem; color: var(--blue);
+    text-decoration: none;
+  }
+  .nav-logo .dot { color: var(--teal); }
+
+  .nav-links {
+    display: flex; gap: 32px; list-style: none;
+  }
+  .nav-links a {
+    font-size: .9rem; font-weight: 500; color: var(--gray);
+    text-decoration: none; transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--blue); }
+
+  .nav-cta {
+    background: var(--blue); color: white;
+    border: none; padding: 10px 22px;
+    border-radius: 50px; font-family: 'Sora', sans-serif;
+    font-weight: 600; font-size: .88rem;
+    cursor: pointer; transition: all .2s;
+    text-decoration: none;
+  }
+  .nav-cta:hover { background: var(--navy); transform: translateY(-1px); }
+
+  .hamburger {
+    display: none; flex-direction: column; gap: 5px;
+    cursor: pointer; border: none; background: none;
+  }
+  .hamburger span {
+    display: block; width: 24px; height: 2px;
+    background: var(--navy); border-radius: 2px; transition: all .3s;
+  }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0B2545 0%, #1565C0 55%, #00897B 100%);
+    display: flex; align-items: center;
+    padding: 100px 5% 60px;
+    position: relative; overflow: hidden;
+  }
+
+  #hero::before {
+    content: '';
+    position: absolute; top: -100px; right: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(33,150,243,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  #hero::after {
+    content: '';
+    position: absolute; bottom: -150px; left: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,137,123,0.20) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero-grid {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: center;
+    position: relative; z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #90CAF9; font-size: .82rem; font-weight: 600;
+    padding: 6px 16px; border-radius: 50px;
+    margin-bottom: 24px; letter-spacing: .5px;
+  }
+  .hero-badge span { width: 6px; height: 6px; background: #69F0AE; border-radius: 50%; animation: pulse 2s infinite; }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .6; transform: scale(1.4); }
+  }
+
+  .hero-title {
+    font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+    color: white; font-weight: 800; line-height: 1.18;
+    margin-bottom: 20px;
+  }
+  .hero-title .accent { color: #69F0AE; }
+
+  .hero-sub {
+    font-size: 1.1rem; color: rgba(255,255,255,.78);
+    max-width: 480px; margin-bottom: 36px; font-weight: 300;
+  }
+
+  .hero-btns {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    margin-bottom: 44px;
+  }
+
+  .btn-primary {
+    background: white; color: var(--blue);
+    padding: 14px 30px; border-radius: 50px;
+    font-family: 'Sora', sans-serif;
+    font-weight: 700; font-size: .95rem;
+    border: none; cursor: pointer;
+    transition: all .25s; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+
+  .btn-outline {
+    background: transparent; color: white;
+    padding: 14px 30px; border-radius: 50px;
+    font-family: 'Sora', sans-serif;
+    font-weight: 600; font-size: .95rem;
+    border: 2px solid rgba(255,255,255,.5);
+    cursor: pointer; transition: all .25s; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-outline:hover { border-color: white; background: rgba(255,255,255,.1); }
+
+  .trust-badges {
+    display: flex; gap: 20px; flex-wrap: wrap;
+  }
+  .trust-item {
+    display: flex; align-items: center; gap: 7px;
+    color: rgba(255,255,255,.70); font-size: .85rem; font-weight: 500;
+  }
+  .trust-item svg { width: 16px; height: 16px; fill: #69F0AE; }
+
+  /* Device visual */
+  .hero-device {
+    display: flex; justify-content: center; align-items: center;
+  }
+  .device-wrapper {
+    position: relative; animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-16px); }
+  }
+
+  .device-card {
+    width: 260px; height: 340px;
+    background: linear-gradient(160deg, #1E3A5F 0%, #0D2137 100%);
+    border-radius: 30px;
+    border: 2px solid rgba(255,255,255,.15);
+    box-shadow: 0 30px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.05);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 18px;
+    position: relative; overflow: hidden;
+  }
+
+  .device-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent);
+  }
+
+  .device-icon-wrap {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, var(--sky), var(--teal));
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 40px rgba(33,150,243,.5);
+  }
+  .device-icon-wrap svg { width: 40px; height: 40px; fill: white; }
+
+  .device-name {
+    font-family: 'Sora', sans-serif; font-weight: 800;
+    font-size: 1.5rem; color: white; letter-spacing: 1px;
+  }
+  .device-sub { font-size: .78rem; color: rgba(255,255,255,.5); letter-spacing: 2px; text-transform: uppercase; }
+
+  .device-stats {
+    display: flex; gap: 16px;
+  }
+  .dstat {
+    background: rgba(255,255,255,.07); border-radius: 12px;
+    padding: 8px 14px; text-align: center;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .dstat-val { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1rem; color: #69F0AE; }
+  .dstat-label { font-size: .7rem; color: rgba(255,255,255,.5); }
+
+  .sos-btn {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, #E53935, #C62828);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Sora', sans-serif; font-weight: 800;
+    font-size: .8rem; color: white; letter-spacing: 1px;
+    box-shadow: 0 0 20px rgba(229,57,53,.6);
+    animation: sos-pulse 2s infinite;
+  }
+  @keyframes sos-pulse {
+    0%,100% { box-shadow: 0 0 20px rgba(229,57,53,.6); }
+    50% { box-shadow: 0 0 40px rgba(229,57,53,.9); }
+  }
+
+  /* floating rings */
+  .ring {
+    position: absolute; border-radius: 50%;
+    border: 1px solid rgba(33,150,243,.3);
+    animation: expand 3s ease-out infinite;
+  }
+  .ring:nth-child(1) { width: 300px; height: 300px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+  .ring:nth-child(2) { width: 400px; height: 400px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 1s; }
+  .ring:nth-child(3) { width: 500px; height: 500px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 2s; }
+  @keyframes expand {
+    0% { opacity: .5; transform: translate(-50%,-50%) scale(.8); }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(1.2); }
+  }
+
+  /* ─── SECTIONS SHARED ─── */
+  section { padding: 90px 5%; }
+
+  .section-label {
+    display: inline-block;
+    font-size: .78rem; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--teal);
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 800; color: var(--navy);
+    line-height: 1.25; margin-bottom: 16px;
+  }
+  .section-title span { color: var(--blue); }
+
+  .section-sub {
+    font-size: 1.05rem; color: var(--gray);
+    max-width: 560px; margin-bottom: 56px;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  /* ─── PROBLEM ─── */
+  #problem { background: var(--off-white); }
+
+  .problems-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+  }
+
+  .problem-card {
+    background: white; border-radius: var(--radius);
+    padding: 28px 24px;
+    border: 1px solid var(--light-gray);
+    transition: all .3s;
+    position: relative; overflow: hidden;
+  }
+  .problem-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--blue), var(--teal));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .3s;
+  }
+  .problem-card:hover::before { transform: scaleX(1); }
+  .problem-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
+
+  .prob-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; margin-bottom: 16px;
+  }
+
+  .prob-title {
+    font-family: 'Sora', sans-serif;
+    font-weight: 700; font-size: 1rem;
+    color: var(--navy); margin-bottom: 8px;
+  }
+  .prob-desc { font-size: .9rem; color: var(--gray); line-height: 1.6; }
+
+  /* ─── SOLUTION ─── */
+  #solution {
+    background: linear-gradient(135deg, var(--navy) 0%, #1565C0 100%);
+    color: white;
+  }
+  #solution .section-title { color: white; }
+  #solution .section-title span { color: #69F0AE; }
+  #solution .section-sub { color: rgba(255,255,255,.7); max-width: 620px; }
+
+  .solution-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: center;
+  }
+
+  .solution-points { display: flex; flex-direction: column; gap: 20px; }
+
+  .sol-point {
+    display: flex; gap: 16px; align-items: flex-start;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: var(--radius); padding: 20px;
+    transition: all .3s;
+  }
+  .sol-point:hover { background: rgba(255,255,255,.10); transform: translateX(6px); }
+
+  .sol-icon {
+    width: 44px; height: 44px; min-width: 44px;
+    background: rgba(33,150,243,.25);
+    border-radius: 12px; display: flex;
+    align-items: center; justify-content: center; font-size: 1.3rem;
+  }
+
+  .sol-text h4 {
+    font-family: 'Sora', sans-serif; font-weight: 700;
+    font-size: .95rem; color: white; margin-bottom: 4px;
+  }
+  .sol-text p { font-size: .87rem; color: rgba(255,255,255,.65); }
+
+  .solution-visual {
+    display: flex; justify-content: center;
+  }
+
+  .sol-phone {
+    width: 220px; height: 420px;
+    background: linear-gradient(160deg, #1E2D40 0%, #111827 100%);
+    border-radius: 36px;
+    border: 3px solid rgba(255,255,255,.12);
+    box-shadow: 0 30px 80px rgba(0,0,0,.5);
+    padding: 20px 14px;
+    display: flex; flex-direction: column; gap: 10px;
+    position: relative;
+    animation: float 5s ease-in-out infinite;
+  }
+
+  .phone-notch {
+    width: 80px; height: 20px;
+    background: rgba(0,0,0,.6); border-radius: 20px;
+    margin: 0 auto 4px;
+  }
+
+  .phone-screen-item {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px; padding: 10px 12px;
+  }
+  .psi-label { font-size: .65rem; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: 1px; }
+  .psi-val { font-family: 'Sora', sans-serif; font-size: 1rem; font-weight: 700; color: #69F0AE; }
+  .psi-sub { font-size: .68rem; color: rgba(255,255,255,.5); }
+
+  .phone-map {
+    flex: 1; background: linear-gradient(135deg, rgba(33,150,243,.15), rgba(0,137,123,.15));
+    border-radius: 12px; border: 1px solid rgba(255,255,255,.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; position: relative; overflow: hidden;
+  }
+  .map-pin {
+    position: absolute; width: 12px; height: 12px;
+    background: var(--sky); border-radius: 50%;
+    top: 40%; left: 50%;
+    box-shadow: 0 0 12px rgba(33,150,243,.8);
+    animation: ping 2s infinite;
+  }
+  @keyframes ping {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.6); opacity: .5; }
+  }
+
+  /* ─── FEATURES ─── */
+  #features { background: var(--white); }
+
+  .features-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+  }
+
+  .feat-card {
+    background: var(--off-white);
+    border-radius: var(--radius);
+    padding: 24px;
+    border: 1px solid transparent;
+    transition: all .3s;
+    position: relative;
+  }
+  .feat-card:hover {
+    background: white;
+    border-color: rgba(21,101,192,.15);
+    box-shadow: var(--shadow);
+    transform: translateY(-4px);
+  }
+
+  .feat-icon {
+    width: 48px; height: 48px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 14px;
+  }
+  .feat-title {
+    font-family: 'Sora', sans-serif; font-weight: 700;
+    font-size: .95rem; color: var(--navy); margin-bottom: 6px;
+  }
+  .feat-desc { font-size: .87rem; color: var(--gray); line-height: 1.5; }
+
+  .feat-tag {
+    display: inline-block; font-size: .7rem;
+    font-weight: 700; letter-spacing: .5px;
+    padding: 3px 10px; border-radius: 50px;
+    margin-top: 10px;
+  }
+
+  /* ─── HOW IT WORKS ─── */
+  #how { background: var(--off-white); }
+
+  .steps-flow {
+    display: flex; align-items: flex-start; gap: 0;
+    flex-wrap: wrap; justify-content: center;
+    position: relative;
+  }
+
+  .step {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; max-width: 180px;
+    position: relative; z-index: 1;
+    flex: 1 1 160px;
+  }
+
+  .step-num-wrap {
+    position: relative; margin-bottom: 16px;
+  }
+  .step-num {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Sora', sans-serif; font-weight: 800;
+    font-size: 1.2rem; color: white;
+    box-shadow: 0 8px 24px rgba(21,101,192,.35);
+    position: relative; z-index: 1;
+  }
+
+  .step-icon { font-size: 1.6rem; margin-bottom: 8px; }
+  .step-title {
+    font-family: 'Sora', sans-serif; font-weight: 700;
+    font-size: .92rem; color: var(--navy); margin-bottom: 6px;
+  }
+  .step-desc { font-size: .82rem; color: var(--gray); }
+
+  .step-arrow {
+    flex: 0 0 40px; display: flex; align-items: center;
+    justify-content: center; color: var(--sky);
+    font-size: 1.4rem; margin-top: 20px;
+    opacity: .7;
+  }
+
+  /* ─── TECH STACK ─── */
+  #tech { background: var(--white); }
+
+  .tech-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+  }
+
+  .tech-card {
+    background: var(--off-white);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    border: 1px solid var(--light-gray);
+  }
+
+  .tech-card-head {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+  }
+  .tech-card-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+  }
+  .tech-card-head h3 {
+    font-family: 'Sora', sans-serif; font-weight: 700;
+    font-size: 1rem; color: var(--navy);
+  }
+
+  .tech-items { display: flex; flex-direction: column; gap: 10px; }
+  .tech-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: .88rem; color: var(--gray);
+  }
+  .tech-item::before {
+    content: ''; width: 6px; height: 6px; min-width: 6px;
+    background: var(--teal); border-radius: 50%;
+  }
+
+  /* ─── USERS ─── */
+  #users { background: var(--light-blue); }
+
+  .users-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+
+  .user-card {
+    background: white; border-radius: var(--radius);
+    padding: 36px 32px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 16px;
+    transition: all .3s;
+  }
+  .user-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+  .user-avatar { font-size: 3.5rem; }
+  .user-card h3 {
+    font-family: 'Sora', sans-serif; font-weight: 800;
+    font-size: 1.3rem; color: var(--navy);
+  }
+  .user-card p { font-size: .95rem; color: var(--gray); }
+
+  .user-needs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .user-need {
+    background: var(--light-blue); color: var(--blue);
+    font-size: .78rem; font-weight: 600;
+    padding: 4px 12px; border-radius: 50px;
+  }
+
+  /* ─── IMPACT ─── */
+  #impact { background: var(--navy); color: white; }
+  #impact .section-title { color: white; }
+  #impact .section-title span { color: #69F0AE; }
+  #impact .section-sub { color: rgba(255,255,255,.7); }
+
+  .impact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+
+  .impact-card {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: var(--radius); padding: 28px 20px;
+    text-align: center; transition: all .3s;
+  }
+  .impact-card:hover { background: rgba(255,255,255,.12); transform: translateY(-4px); }
+
+  .impact-stat {
+    font-family: 'Sora', sans-serif; font-weight: 800;
+    font-size: 2.4rem; color: #69F0AE; margin-bottom: 6px;
+    line-height: 1;
+  }
+  .impact-title {
+    font-family: 'Sora', sans-serif; font-weight: 700;
+    font-size: .92rem; color: white; margin-bottom: 8px;
+  }
+  .impact-desc { font-size: .83rem; color: rgba(255,255,255,.55); }
+
+  /* ─── FUTURE ─── */
+  #future { background: white; }
+
+  .future-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+
+  .future-card {
+    background: linear-gradient(135deg, var(--off-white), var(--light-blue));
+    border-radius: var(--radius); padding: 28px 24px;
+    border: 1px solid rgba(21,101,192,.12);
+    transition: all .3s;
+  }
+  .future-card:hover { box-shadow: var(--shadow); transform: translateY(-4px); }
+
+  .future-icon { font-size: 2rem; margin-bottom: 14px; }
+  .future-card h3 {
+    font-family: 'Sora', sans-serif; font-weight: 700;
+    font-size: .98rem; color: var(--navy); margin-bottom: 8px;
+  }
+  .future-card p { font-size: .87rem; color: var(--gray); }
+
+  /* ─── FOOTER / CONTACT ─── */
+  #contact {
+    background: linear-gradient(135deg, #0B2545, #1565C0);
+    color: white; padding-bottom: 0;
+  }
+
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; padding-bottom: 60px; }
+
+  .contact-info h2 {
+    font-family: 'Sora', sans-serif; font-weight: 800;
+    font-size: 2rem; color: white; margin-bottom: 16px;
+  }
+  .contact-info p { color: rgba(255,255,255,.7); margin-bottom: 28px; }
+
+  .contact-detail {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px; color: rgba(255,255,255,.75); font-size: .93rem;
+  }
+  .contact-detail .icon {
+    width: 36px; height: 36px; background: rgba(255,255,255,.12);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+  }
+
+  .contact-form {
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 20px; padding: 32px;
+  }
+  .contact-form h3 {
+    font-family: 'Sora', sans-serif; font-weight: 700;
+    color: white; font-size: 1.2rem; margin-bottom: 20px;
+  }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: .82rem; color: rgba(255,255,255,.6); margin-bottom: 6px; font-weight: 500; }
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%; padding: 12px 16px;
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 10px; color: white;
+    font-family: 'DM Sans', sans-serif; font-size: .92rem;
+    transition: all .2s; outline: none;
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder { color: rgba(255,255,255,.35); }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus { border-color: rgba(33,150,243,.6); background: rgba(255,255,255,.14); }
+  .form-group select option { background: var(--navy); color: white; }
+  .form-group textarea { height: 90px; resize: vertical; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .btn-submit {
+    width: 100%; padding: 14px;
+    background: linear-gradient(90deg, #21C0A5, #1565C0);
+    color: white; border: none; border-radius: 10px;
+    font-family: 'Sora', sans-serif; font-weight: 700; font-size: .95rem;
+    cursor: pointer; transition: all .25s; margin-top: 4px;
+  }
+  .btn-submit:hover { opacity: .88; transform: translateY(-1px); }
+
+  .team-section {
+    padding: 40px 0;
+    border-top: 1px solid rgba(255,255,255,.1);
+  }
+  .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; margin-top: 24px; }
+  .team-member {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 14px; padding: 20px 16px;
+    text-align: center;
+  }
+  .team-avatar {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--sky), var(--teal));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1.1rem; color: white;
+    margin: 0 auto 10px;
+  }
+  .team-name { font-family: 'Sora', sans-serif; font-weight: 700; font-size: .88rem; color: white; }
+  .team-role { font-size: .75rem; color: rgba(255,255,255,.5); }
+
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,.1);
+    padding: 24px 0;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px;
+  }
+
+  .footer-logo {
+    font-family: 'Sora', sans-serif; font-weight: 800;
+    font-size: 1.2rem; color: white;
+  }
+  .footer-logo span { color: #69F0AE; }
+
+  .footer-tagline { font-size: .85rem; color: rgba(255,255,255,.5); }
+
+  .social-links { display: flex; gap: 12px; }
+  .social-link {
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,.1); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,.7); text-decoration: none;
+    font-size: 1rem; transition: all .2s;
+  }
+  .social-link:hover { background: rgba(255,255,255,.2); color: white; }
+
+  /* ─── SCROLL ANIMATIONS ─── */
+  .fade-up {
+    opacity: 0; transform: translateY(30px);
+    transition: all .7s ease;
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  .fade-in {
+    opacity: 0; transition: opacity .7s ease;
+  }
+  .fade-in.visible { opacity: 1; }
+
+  /* ─── MOBILE NAV ─── */
+  .mobile-nav {
+    display: none;
+    position: fixed; top: 68px; left: 0; right: 0;
+    background: white; z-index: 999;
+    padding: 20px 5%;
+    box-shadow: var(--shadow-lg);
+    flex-direction: column; gap: 16px;
+  }
+  .mobile-nav.open { display: flex; }
+  .mobile-nav a { color: var(--navy); text-decoration: none; font-weight: 500; font-size: 1rem; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .hero-grid, .solution-grid, .contact-grid, .users-grid { grid-template-columns: 1fr; }
+    .hero-device { margin-top: 20px; }
+    .tech-grid { grid-template-columns: 1fr 1fr; }
+    .impact-grid { grid-template-columns: 1fr 1fr; }
+    .nav-links, .nav-cta { display: none; }
+    .hamburger { display: flex; }
+    .step-arrow { display: none; }
+    .steps-flow { gap: 20px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    section { padding: 60px 5%; }
+    .tech-grid, .impact-grid { grid-template-columns: 1fr; }
+    .device-card { width: 220px; height: 300px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">Mind<span class="dot">Mate</span> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="margin-left:2px"><circle cx="12" cy="12" r="10" fill="#1565C0" opacity=".15"/><circle cx="12" cy="12" r="5" fill="#1565C0"/></svg></a>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#tech">Technology</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Request Demo</a>
+  <button class="hamburger" onclick="toggleNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-nav" id="mobileNav">
+  <a href="#problem" onclick="closeNav()">Problem</a>
+  <a href="#features" onclick="closeNav()">Features</a>
+  <a href="#how" onclick="closeNav()">How It Works</a>
+  <a href="#tech" onclick="closeNav()">Technology</a>
+  <a href="#contact" onclick="closeNav()">Contact</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-badge"><span></span> Smart Wearable Healthcare Device</div>
+      <h1 class="hero-title">Smart Safety for<br><span class="accent">Alzheimer's</span> Patients</h1>
+      <p class="hero-sub">Real-time GPS tracking, health monitoring, and instant emergency alerts — all in a simple wearable badge.</p>
+      <div class="hero-btns">
+        <a href="#features" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" style="display:none"/><path d="M8 5v14l11-7z"/></svg>
+          View Features
+        </a>
+        <a href="#contact" class="btn-outline">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          Request Demo
+        </a>
+      </div>
+      <div class="trust-badges">
+        <div class="trust-item">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+          Secure
+        </div>
+        <div class="trust-item">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Reliable
+        </div>
+        <div class="trust-item">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+          24/7 Monitoring
+        </div>
+        <div class="trust-item">
+          <svg viewBox="0 0 24 24"><path d="M4.5 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM14.25 8.625a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0zM1.5 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM17.25 19.128l-.001.144a2.25 2.25 0 01-.233.96 10.088 10.088 0 005.06-1.01.75.75 0 00.42-.643 4.875 4.875 0 00-6.957-4.611 8.586 8.586 0 011.71 5.157v.003z"/></svg>
+          Family Connected
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-device">
+      <div style="position:relative">
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="device-wrapper">
+          <div class="device-card">
+            <div class="device-icon-wrap">
+              <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+            </div>
+            <div class="device-name">MindMate</div>
+            <div class="device-sub">Smart Badge · SIM Ready</div>
+            <div class="device-stats">
+              <div class="dstat">
+                <div class="dstat-val">72 bpm</div>
+                <div class="dstat-label">Heart Rate</div>
+              </div>
+              <div class="dstat">
+                <div class="dstat-val">GPS</div>
+                <div class="dstat-label">Active</div>
+              </div>
+            </div>
+            <div class="sos-btn">SOS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="container">
+    <div class="fade-up">
+      <span class="section-label">The Challenge</span>
+      <h2 class="section-title">Alzheimer's Patients Face <span>Daily Risks</span></h2>
+      <p class="section-sub">Millions of families deal with life-threatening challenges every day. Current solutions are either too expensive, too complex, or simply not enough.</p>
+    </div>
+    <div class="problems-grid">
+      <div class="problem-card fade-up" style="transition-delay:.1s">
+        <div class="prob-icon" style="background:#FFF3E0">🚶</div>
+        <div class="prob-title">Wandering & Getting Lost</div>
+        <p class="prob-desc">Alzheimer's patients frequently wander away from home, putting themselves in immediate danger and causing family panic.</p>
+      </div>
+      <div class="problem-card fade-up" style="transition-delay:.2s">
+        <div class="prob-icon" style="background:#FCE4EC">💊</div>
+        <div class="prob-title">Missed Medications</div>
+        <p class="prob-desc">Forgetting critical medications is common and can quickly lead to serious health complications or emergencies.</p>
+      </div>
+      <div class="problem-card fade-up" style="transition-delay:.3s">
+        <div class="prob-icon" style="background:#E8EAF6">🩺</div>
+        <div class="prob-title">Fall Risk</div>
+        <p class="prob-desc">Falls are a leading cause of injury in elderly patients. Without detection, help may arrive far too late.</p>
+      </div>
+      <div class="problem-card fade-up" style="transition-delay:.4s">
+        <div class="prob-icon" style="background:#E0F2F1">😰</div>
+        <div class="prob-title">Caregiver Stress</div>
+        <p class="prob-desc">Constant supervision is emotionally and physically exhausting. Caregivers can't watch their loved one every single minute.</p>
+      </div>
+      <div class="problem-card fade-up" style="transition-delay:.5s">
+        <div class="prob-icon" style="background:#F3E5F5">💸</div>
+        <div class="prob-title">Expensive Solutions</div>
+        <p class="prob-desc">Most existing monitoring solutions require Wi-Fi, are costly, or are too technically complex for elderly patients to use.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section id="solution">
+  <div class="container">
+    <div class="fade-up">
+      <span class="section-label" style="color:#69F0AE">Our Solution</span>
+      <h2 class="section-title">Meet <span>MindMate</span> — The Smart Badge</h2>
+      <p class="section-sub">A wearable SIM-based badge that works everywhere — no Wi-Fi needed. Simple for patients. Powerful for caregivers.</p>
+    </div>
+    <div class="solution-grid">
+      <div class="solution-points fade-up">
+        <div class="sol-point">
+          <div class="sol-icon">📡</div>
+          <div class="sol-text">
+            <h4>SIM-Based — Works Anywhere</h4>
+            <p>No Wi-Fi dependency. Uses cellular network for uninterrupted coverage indoors and outdoors.</p>
+          </div>
+        </div>
+        <div class="sol-point">
+          <div class="sol-icon">📍</div>
+          <div class="sol-text">
+            <h4>Real-Time GPS Tracking</h4>
+            <p>Live location updates every few seconds — know exactly where your loved one is, always.</p>
+          </div>
+        </div>
+        <div class="sol-point">
+          <div class="sol-icon">❤️</div>
+          <div class="sol-text">
+            <h4>Continuous Health Monitoring</h4>
+            <p>Heart rate, blood pressure, and movement data collected and analyzed in real time.</p>
+          </div>
+        </div>
+        <div class="sol-point">
+          <div class="sol-icon">🔒</div>
+          <div class="sol-text">
+            <h4>Simple Badge Design</h4>
+            <p>Easy-to-wear, lightweight badge. No setup required for patients — just wear and stay safe.</p>
+          </div>
+        </div>
+        <div class="sol-point">
+          <div class="sol-icon">📱</div>
+          <div class="sol-text">
+            <h4>Controlled via Caregiver App</h4>
+            <p>Full control through a clean mobile app — alerts, geofences, history, medication reminders.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="solution-visual fade-in">
+        <div class="sol-phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen-item">
+            <div class="psi-label">Patient: Margaret, 78</div>
+            <div class="psi-val">✅ Safe &amp; Active</div>
+          </div>
+          <div class="phone-map">
+            <div class="map-pin"></div>
+            📍
+          </div>
+          <div class="phone-screen-item">
+            <div class="psi-label">Heart Rate</div>
+            <div class="psi-val">72 bpm <span style="color:rgba(255,255,255,.4);font-weight:400">Normal</span></div>
+          </div>
+          <div class="phone-screen-item">
+            <div class="psi-label">Blood Pressure</div>
+            <div class="psi-val">118/76 mmHg</div>
+          </div>
+          <div class="phone-screen-item" style="background:rgba(229,57,53,.15);border-color:rgba(229,57,53,.3)">
+            <div class="psi-label">⚠️ Medication Reminder</div>
+            <div class="psi-val" style="color:#EF9A9A">Due in 30 min</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="fade-up">
+      <span class="section-label">What It Does</span>
+      <h2 class="section-title">15 Powerful Features in <span>One Badge</span></h2>
+      <p class="section-sub">Everything a caregiver needs — packed into a lightweight, easy-to-wear device.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card fade-up" style="transition-delay:.05s">
+        <div class="feat-icon" style="background:#E3F2FD">📍</div>
+        <div class="feat-title">Real-Time GPS Tracking</div>
+        <p class="feat-desc">Live location updates via cellular network. Know where your patient is, second by second.</p>
+        <span class="feat-tag" style="background:#E3F2FD;color:#1565C0">Location</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.10s">
+        <div class="feat-icon" style="background:#E8F5E9">🔲</div>
+        <div class="feat-title">Safe Zone Geo-fencing</div>
+        <p class="feat-desc">Set virtual boundaries. Instant alert when the patient steps outside the defined safe area.</p>
+        <span class="feat-tag" style="background:#E8F5E9;color:#2E7D32">Safety</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.15s">
+        <div class="feat-icon" style="background:#FFF8E1">⚡</div>
+        <div class="feat-title">Fall Detection</div>
+        <p class="feat-desc">Accelerometer detects sudden impact or falls and immediately triggers an emergency alert.</p>
+        <span class="feat-tag" style="background:#FFF8E1;color:#F57F17">Emergency</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.20s">
+        <div class="feat-icon" style="background:#FFEBEE">🆘</div>
+        <div class="feat-title">SOS Emergency Button</div>
+        <p class="feat-desc">One-press physical button that instantly alerts caregivers and family members via SMS and call.</p>
+        <span class="feat-tag" style="background:#FFEBEE;color:#C62828">Emergency</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.25s">
+        <div class="feat-icon" style="background:#FCE4EC">📞</div>
+        <div class="feat-title">Auto Emergency Call Sequence</div>
+        <p class="feat-desc">Auto-dials caregiver, family, then emergency services in sequence if SOS is triggered.</p>
+        <span class="feat-tag" style="background:#FCE4EC;color:#AD1457">Emergency</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.30s">
+        <div class="feat-icon" style="background:#E8EAF6">❤️</div>
+        <div class="feat-title">Heart Rate Monitoring</div>
+        <p class="feat-desc">Continuous optical heart rate sensor tracks pulse. Alerts for abnormal high or low readings.</p>
+        <span class="feat-tag" style="background:#E8EAF6;color:#3949AB">Health</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.35s">
+        <div class="feat-icon" style="background:#E0F7FA">🩺</div>
+        <div class="feat-title">Blood Pressure Monitoring</div>
+        <p class="feat-desc">Tracks systolic and diastolic readings. Logs trends and flags hypertensive episodes.</p>
+        <span class="feat-tag" style="background:#E0F7FA;color:#00695C">Health</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.40s">
+        <div class="feat-icon" style="background:#FFF3E0">🔔</div>
+        <div class="feat-title">Abnormal Vital Alerts</div>
+        <p class="feat-desc">AI-powered threshold detection sends real-time push notifications for dangerous health readings.</p>
+        <span class="feat-tag" style="background:#FFF3E0;color:#E65100">Alerts</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.45s">
+        <div class="feat-icon" style="background:#E8F5E9">💊</div>
+        <div class="feat-title">Medication Reminders</div>
+        <p class="feat-desc">Scheduled audio and vibration reminders for patient. Caregiver app confirms compliance.</p>
+        <span class="feat-tag" style="background:#E8F5E9;color:#2E7D32">Health</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.50s">
+        <div class="feat-icon" style="background:#F3E5F5">🔊</div>
+        <div class="feat-title">Voice Reassurance Alerts</div>
+        <p class="feat-desc">Calming pre-recorded messages play for the patient to reduce anxiety during alert events.</p>
+        <span class="feat-tag" style="background:#F3E5F5;color:#6A1B9A">Care</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.55s">
+        <div class="feat-icon" style="background:#E3F2FD">📣</div>
+        <div class="feat-title">Two-Way Calling</div>
+        <p class="feat-desc">Built-in speaker and mic allow caregivers to directly communicate with the patient anytime.</p>
+        <span class="feat-tag" style="background:#E3F2FD;color:#1565C0">Communication</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.60s">
+        <div class="feat-icon" style="background:#E8F5E9">🔋</div>
+        <div class="feat-title">Battery Status Alerts</div>
+        <p class="feat-desc">Proactive low-battery alerts sent to caregiver app — device is never caught off-guard.</p>
+        <span class="feat-tag" style="background:#E8F5E9;color:#2E7D32">Device</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.65s">
+        <div class="feat-icon" style="background:#FFF8E1">🏥</div>
+        <div class="feat-title">Hospital-Linked Registration</div>
+        <p class="feat-desc">Device registered with patient's hospital profile. Emergency rooms can access critical info instantly.</p>
+        <span class="feat-tag" style="background:#FFF8E1;color:#F57F17">Medical</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.70s">
+        <div class="feat-icon" style="background:#E0F2F1">☁️</div>
+        <div class="feat-title">Secure Cloud Storage</div>
+        <p class="feat-desc">All health data encrypted and stored securely. Access historical records from any device anytime.</p>
+        <span class="feat-tag" style="background:#E0F2F1;color:#00695C">Data</span>
+      </div>
+      <div class="feat-card fade-up" style="transition-delay:.75s">
+        <div class="feat-icon" style="background:#E8EAF6">📱</div>
+        <div class="feat-title">QR Code Emergency Info</div>
+        <p class="feat-desc">Physical QR on device links first responders to full medical history, contacts, and conditions.</p>
+        <span class="feat-tag" style="background:#E8EAF6;color:#3949AB">Emergency</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="container">
+    <div class="fade-up" style="text-align:center">
+      <span class="section-label">The Process</span>
+      <h2 class="section-title" style="text-align:center">How <span>MindMate</span> Works</h2>
+      <p class="section-sub" style="margin:0 auto 60px">From continuous monitoring to emergency response — a seamless, automatic safety chain.</p>
+    </div>
+    <div class="steps-flow fade-up">
+      <div class="step">
+        <div class="step-num-wrap">
+          <div class="step-num">1</div>
+        </div>
+        <div class="step-icon">📡</div>
+        <div class="step-title">Continuous Monitoring</div>
+        <p class="step-desc">Device tracks vitals & GPS location in real time, 24/7 via SIM network.</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num-wrap">
+          <div class="step-num">2</div>
+        </div>
+        <div class="step-icon">⚡</div>
+        <div class="step-title">Anomaly Detection</div>
+        <p class="step-desc">Fall detected, geofence breached, or abnormal vital reading identified by onboard sensors.</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num-wrap">
+          <div class="step-num">3</div>
+        </div>
+        <div class="step-icon">📶</div>
+        <div class="step-title">SIM Alert Sent</div>
+        <p class="step-desc">Instant alert transmitted via cellular SIM. No Wi-Fi required — works anywhere.</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num-wrap">
+          <div class="step-num">4</div>
+        </div>
+        <div class="step-icon">📲</div>
+        <div class="step-title">Caregiver Notified</div>
+        <p class="step-desc">Push notification with live location and event details sent to caregiver app immediately.</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num-wrap">
+          <div class="step-num">5</div>
+        </div>
+        <div class="step-icon">🚨</div>
+        <div class="step-title">Emergency Response</div>
+        <p class="step-desc">Auto-call sequence initiated. Two-way voice activated. Emergency services alerted if needed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section id="tech">
+  <div class="container">
+    <div class="fade-up">
+      <span class="section-label">Under the Hood</span>
+      <h2 class="section-title">Built on Proven <span>Technology</span></h2>
+      <p class="section-sub">Medical-grade hardware combined with cloud-native software for rock-solid performance.</p>
+    </div>
+    <div class="tech-grid fade-up">
+      <div class="tech-card">
+        <div class="tech-card-head">
+          <div class="tech-card-icon" style="background:#E3F2FD;font-size:1.3rem">🔧</div>
+          <h3>Hardware Components</h3>
+        </div>
+        <div class="tech-items">
+          <div class="tech-item">ESP32 Microcontroller</div>
+          <div class="tech-item">GPS Module (u-blox NEO)</div>
+          <div class="tech-item">GSM / LTE SIM Module</div>
+          <div class="tech-item">Heart Rate Optical Sensor</div>
+          <div class="tech-item">Blood Pressure Sensor</div>
+          <div class="tech-item">3-Axis Accelerometer</div>
+          <div class="tech-item">Built-in Speaker & Mic</div>
+          <div class="tech-item">Li-ion Rechargeable Battery</div>
+        </div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-card-head">
+          <div class="tech-card-icon" style="background:#E8F5E9;font-size:1.3rem">💻</div>
+          <h3>Software Platform</h3>
+        </div>
+        <div class="tech-items">
+          <div class="tech-item">Mobile App (iOS & Android)</div>
+          <div class="tech-item">Web Dashboard (Caregiver & Hospital)</div>
+          <div class="tech-item">Cloud Database (Encrypted)</div>
+          <div class="tech-item">Real-time Notification System</div>
+          <div class="tech-item">RESTful API Layer</div>
+          <div class="tech-item">End-to-End Encrypted Comms</div>
+          <div class="tech-item">Analytics & Reporting Engine</div>
+        </div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-card-head">
+          <div class="tech-card-icon" style="background:#F3E5F5;font-size:1.3rem">🖥️</div>
+          <h3>Infrastructure</h3>
+        </div>
+        <div class="tech-items">
+          <div class="tech-item">AMD-Based Scalable Backend Servers</div>
+          <div class="tech-item">HIPAA-Compliant Cloud Storage</div>
+          <div class="tech-item">Multi-region Data Redundancy</div>
+          <div class="tech-item">MQTT for IoT Messaging</div>
+          <div class="tech-item">TLS 1.3 Security Protocol</div>
+          <div class="tech-item">Horizontal Scalability</div>
+          <div class="tech-item">99.9% Uptime SLA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TARGET USERS -->
+<section id="users">
+  <div class="container">
+    <div class="fade-up">
+      <span class="section-label">Who It's For</span>
+      <h2 class="section-title">Designed for <span>Real Lives</span></h2>
+      <p class="section-sub">MindMate serves two audiences — with different needs, both equally important to us.</p>
+    </div>
+    <div class="users-grid fade-up">
+      <div class="user-card">
+        <div class="user-avatar">👴</div>
+        <h3>Alzheimer's Patients</h3>
+        <p>Elderly individuals who need safety and monitoring without the burden of complex technology. MindMate requires zero interaction — it just works silently in the background.</p>
+        <div class="user-needs">
+          <span class="user-need">Independent Living</span>
+          <span class="user-need">Fall Protection</span>
+          <span class="user-need">Medication Help</span>
+          <span class="user-need">Simple to Use</span>
+          <span class="user-need">Comfort & Dignity</span>
+        </div>
+      </div>
+      <div class="user-card">
+        <div class="user-avatar">👨‍👩‍👧</div>
+        <h3>Caregivers & Families</h3>
+        <p>Families and professional caregivers who need real-time peace of mind. The companion app provides live tracking, health alerts, and full event history with zero technical complexity.</p>
+        <div class="user-needs">
+          <span class="user-need">Real-time Alerts</span>
+          <span class="user-need">Location Tracking</span>
+          <span class="user-need">Health Dashboard</span>
+          <span class="user-need">Peace of Mind</span>
+          <span class="user-need">Emergency Tools</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section id="impact">
+  <div class="container">
+    <div class="fade-up" style="text-align:center">
+      <span class="section-label" style="color:#69F0AE">Our Impact</span>
+      <h2 class="section-title" style="text-align:center">Making Care <span>Better</span></h2>
+      <p class="section-sub" style="margin:0 auto 56px">Tangible outcomes for patients, families, and the healthcare system.</p>
+    </div>
+    <div class="impact-grid fade-up">
+      <div class="impact-card">
+        <div class="impact-stat">90%</div>
+        <div class="impact-title">Faster Emergency Response</div>
+        <p class="impact-desc">Automated alerts and location data drastically reduce response times in crisis situations.</p>
+      </div>
+      <div class="impact-card">
+        <div class="impact-stat">3×</div>
+        <div class="impact-title">Reduced Caregiver Stress</div>
+        <p class="impact-desc">Continuous monitoring means caregivers can step away without constant worry.</p>
+      </div>
+      <div class="impact-card">
+        <div class="impact-stat">24/7</div>
+        <div class="impact-title">Uninterrupted Safety</div>
+        <p class="impact-desc">SIM-based coverage ensures protection whether patient is at home, outdoors, or traveling.</p>
+      </div>
+      <div class="impact-card">
+        <div class="impact-stat">₹↓</div>
+        <div class="impact-title">Affordable & Scalable</div>
+        <p class="impact-desc">Fraction of the cost of institutional care, yet delivering institutional-grade monitoring.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FUTURE SCOPE -->
+<section id="future">
+  <div class="container">
+    <div class="fade-up">
+      <span class="section-label">What's Next</span>
+      <h2 class="section-title">The Future of <span>MindMate</span></h2>
+      <p class="section-sub">We're just getting started. Here's where the roadmap is taking us next.</p>
+    </div>
+    <div class="future-grid fade-up">
+      <div class="future-card">
+        <div class="future-icon">🤖</div>
+        <h3>AI Risk Prediction</h3>
+        <p>Machine learning models trained on behavioral patterns to predict wandering or health events before they happen.</p>
+      </div>
+      <div class="future-card">
+        <div class="future-icon">📊</div>
+        <h3>Advanced Health Analytics</h3>
+        <p>Deep trend analysis, sleep pattern tracking, and predictive health reporting for long-term care planning.</p>
+      </div>
+      <div class="future-card">
+        <div class="future-icon">👨‍⚕️</div>
+        <h3>Doctor Remote Monitoring</h3>
+        <p>Physicians can review patient vitals and health history remotely, enabling proactive and preventive care.</p>
+      </div>
+      <div class="future-card">
+        <div class="future-icon">🏥</div>
+        <h3>Healthcare System Integration</h3>
+        <p>Full EHR / EMR integration with hospitals, pharmacies, and emergency medical services for seamless care.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT & FOOTER -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info fade-up">
+        <h2>Let's Connect & Build Together</h2>
+        <p>Interested in MindMate for your family, hospital, or partnership? We'd love to hear from you. Fill out the form and we'll get back to you within 24 hours.</p>
+        <div class="contact-detail">
+          <div class="icon">📧</div>
+          hello@mindmate.health
+        </div>
+        <div class="contact-detail">
+          <div class="icon">📱</div>
+          +91 98765 43210
+        </div>
+        <div class="contact-detail">
+          <div class="icon">📍</div>
+          India (Nationwide Deployment)
+        </div>
+        <div class="contact-detail">
+          <div class="icon">🏥</div>
+          Hospital partnerships welcome
+        </div>
+
+        <div class="team-section">
+          <p style="color:rgba(255,255,255,.5);font-size:.82rem;font-weight:600;letter-spacing:2px;text-transform:uppercase">The Team</p>
+          <div class="team-grid">
+            <div class="team-member">
+              <div class="team-avatar">A</div>
+              <div class="team-name">Arjun S.</div>
+              <div class="team-role">Hardware Lead</div>
+            </div>
+            <div class="team-member">
+              <div class="team-avatar">P</div>
+              <div class="team-name">Priya M.</div>
+              <div class="team-role">Software Lead</div>
+            </div>
+            <div class="team-member">
+              <div class="team-avatar">R</div>
+              <div class="team-name">Rohan K.</div>
+              <div class="team-role">ML Engineer</div>
+            </div>
+            <div class="team-member">
+              <div class="team-avatar">S</div>
+              <div class="team-name">Sara J.</div>
+              <div class="team-role">UX Designer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form fade-up" style="transition-delay:.2s">
+        <h3>📋 Request a Demo</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" placeholder="John">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" placeholder="Doe">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" placeholder="+91 98765 43210">
+        </div>
+        <div class="form-group">
+          <label>I Am A...</label>
+          <select>
+            <option value="">Select your role</option>
+            <option>Family Member / Caregiver</option>
+            <option>Healthcare Professional</option>
+            <option>Hospital Administrator</option>
+            <option>Investor / Partner</option>
+            <option>Researcher</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea placeholder="Tell us how we can help or what you'd like to explore..."></textarea>
+        </div>
+        <button class="btn-submit" onclick="handleSubmit()">🚀 Send Message & Request Demo</button>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>
+        <div class="footer-logo">Mind<span>Mate</span></div>
+        <p class="footer-tagline">Safety, Health & Peace of Mind — for every family.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <p style="font-size:.8rem;color:rgba(255,255,255,.4)">© 2025 MindMate. All rights reserved. Built with ❤️ for caregivers.</p>
+        <div class="social-links">
+          <a href="#" class="social-link" title="LinkedIn">in</a>
+          <a href="#" class="social-link" title="Twitter">𝕏</a>
+          <a href="#" class="social-link" title="GitHub">⌥</a>
+          <a href="#" class="social-link" title="Instagram">◎</a>
+        </div>
+      </div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap">
+        <a href="#" style="color:rgba(255,255,255,.5);font-size:.82rem;text-decoration:none">Privacy Policy</a>
+        <a href="#" style="color:rgba(255,255,255,.5);font-size:.82rem;text-decoration:none">Terms of Use</a>
+        <a href="#" style="color:rgba(255,255,255,.5);font-size:.82rem;text-decoration:none">HIPAA Compliance</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-up, .fade-in').forEach(el => observer.observe(el));
+
+  // Navbar scroll effect
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Mobile nav
+  function toggleNav() {
+    document.getElementById('mobileNav').classList.toggle('open');
+  }
+  function closeNav() {
+    document.getElementById('mobileNav').classList.remove('open');
+  }
+
+  // Form submit
+  function handleSubmit() {
+    const btn = document.querySelector('.btn-submit');
+    btn.textContent = '✅ Message Sent! We\'ll be in touch soon.';
+    btn.style.background = 'linear-gradient(90deg, #2E7D32, #00897B)';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = '🚀 Send Message & Request Demo';
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 5000);
+  }
+</script>
+</body>
+</html>
